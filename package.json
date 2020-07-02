@@ -1,0 +1,31 @@
+{
+  "name": "react-observable",
+  "version": "1.0.0-alpha.0",
+  "description": "A observable binding for React",
+  "main": "index.ts",
+  "author": "Yazan Alaboudi <yazan.alaboudi@gmail.com>",
+  "keywords": [
+    "observable",
+    "binding",
+    "react",
+    "reactive programming"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
+  "peerDependencies": {
+    "react": "^16.13.1",
+    "rxjs": "^6.5.5"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.41",
+    "react": "^16.13.1",
+    "rxjs": "^6.5.5",
+    "typescript": "^3.9.5"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "dependencies": {}
+}
