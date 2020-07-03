@@ -7,7 +7,7 @@ const useObservable = <T>(source$: Observable<T>, initialValue?: T) => {
     useEffect(() => {
         const subscription = source$.subscribe(setEmittedValue);
         return () => subscription.unsubscribe();
-    }, []);
+    }, [source$]);
 
     return emittedValue;
 }
