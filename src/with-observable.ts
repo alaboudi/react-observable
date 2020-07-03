@@ -1,5 +1,13 @@
 import { createFactory, Component, ComponentClass, ComponentType} from "react";
 import { Observable, Subscription } from "rxjs";
+import skipSync from "./operators/skip-sync";
+
+const resolveInitialValue = <T>(source$: Observable<T>, initialValue?: T): (T | undefined) => {
+    let value: T;
+    const subscription = source$.subscribe(v => value = v);
+    subscription.unsubscribe();
+    return typeof value === 'undefined' ? initialValue : value;
+}
 
 const withObservable = <T>(propName: string, source$: Observable<T>, initialValue?: T) => <P>(BaseComponent: ComponentType<P>) => {
     const factory = createFactory(BaseComponent as ComponentClass<P>);
@@ -8,7 +16,7 @@ const withObservable = <T>(propName: string, source$: Observable<T>, initialValu
         subscription: Subscription | undefined;
         constructor(props: P) {
             super(props);
-            this.state = {emittedValue: initialValue};
+            this.state = {emittedValue: resolveInitialValue(source$, initialValue)};
         }
 
         setObservableValue(val: T) {
@@ -16,12 +24,16 @@ const withObservable = <T>(propName: string, source$: Observable<T>, initialValu
         }
 
         componentDidMount() {
-            this.subscription = source$.subscribe(this.setObservableValue);
+            this.subscription = source$
+                .pipe(skipSync)
+                .subscribe(this.setObservableValue);
         }
 
         componentDidUpdate() {
             this.subscription?.unsubscribe();
-            this.subscription = source$.subscribe(this.setObservableValue);
+            this.subscription = source$
+                .pipe(skipSync)
+                .subscribe(this.setObservableValue);
         }
 
         componentWillUnmount() {
