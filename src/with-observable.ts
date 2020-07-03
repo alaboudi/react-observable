@@ -1,14 +1,14 @@
-import { createFactory, Component, ComponentClass, ComponentType, ClassType} from "react";
+import { createFactory, Component, ComponentClass, ComponentType} from "react";
 import { Observable, Subscription } from "rxjs";
 
-const withObservable = <T>(propName: string, source$: Observable<T>) => <P>(BaseComponent: ComponentType<P>) => {
+const withObservable = <T>(propName: string, source$: Observable<T>, initialValue?: T) => <P>(BaseComponent: ComponentType<P>) => {
     const factory = createFactory(BaseComponent as ComponentClass<P>);
 
     return class extends Component<P, { emittedValue?: T }> {
         subscription: Subscription | undefined;
         constructor(props: P) {
             super(props);
-            this.state = {emittedValue: undefined};
+            this.state = {emittedValue: initialValue};
         }
 
         setObservableValue(val: T) {
