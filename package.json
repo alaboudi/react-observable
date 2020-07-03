@@ -1,5 +1,5 @@
 {
-  "name": "react-observable",
+  "name": "@alaboudi/react-observable",
   "version": "1.0.0-alpha.0",
   "description": "A observable binding for React",
   "main": "index.ts",
