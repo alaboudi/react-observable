@@ -4,12 +4,12 @@ A simple observable binding for your React components.
 ## Installation
 with Yarn
 ```
-yarn install react-obs
+yarn install @alaboudi/react-observable
 ```
 
 with NPM
 ```
-npm install react-obs
+npm install @alaboudi/react-observable
 ```
 
 ## Usage
