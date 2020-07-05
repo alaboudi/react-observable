@@ -1,5 +1,7 @@
-import { share } from "rxjs/operators";
+import { skip } from "rxjs/operators";
 import { Observable } from "rxjs";
+
+import resolveSyncEmissionAmount from "../utility/resolve-sync-emission-amount";
 
 /**
  * This operator skips all synchronously emitted values from an observable.
@@ -19,11 +21,10 @@ import { Observable } from "rxjs";
  * @return {Observable<T>}
  */
 const skipSync = <T>(source$: Observable<T>): Observable<T> => {
-    const noop = () => {}
-    const shared$ = source$.pipe(share());
-    const subscription = shared$.subscribe(noop);
-    subscription.unsubscribe();
-    return shared$;
+    const numOfSyncEmissions = resolveSyncEmissionAmount(source$);
+    return source$.pipe(
+        skip(numOfSyncEmissions)
+    );
 }
 
 export default skipSync;
