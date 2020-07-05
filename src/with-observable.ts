@@ -1,12 +1,11 @@
 import { createFactory, Component, ComponentClass, ComponentType} from "react";
 import { Observable, Subscription } from "rxjs";
 import skipSync from "./operators/skip-sync";
+import getLastSyncEmission from "./utility/get-last-sync-emission";
 
 const resolveInitialValue = <T>(source$: Observable<T>, initialValue?: T): (T | undefined) => {
-    let value: T;
-    const subscription = source$.subscribe(v => value = v);
-    subscription.unsubscribe();
-    return typeof value === 'undefined' ? initialValue : value;
+    const lastSyncEmission = getLastSyncEmission(source$);
+    return typeof lastSyncEmission === 'undefined' ? initialValue : lastSyncEmission;
 }
 
 const withObservable = <T>(propName: string, source$: Observable<T>, initialValue?: T) => <P>(BaseComponent: ComponentType<P>) => {
