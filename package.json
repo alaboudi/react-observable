@@ -20,7 +20,7 @@
     "build": "rm -rf dist && tsc",
     "test": "jest",
     "prepare": "yarn run build",
-    "postpublish": "git push --tags"
+    "postpublish": "git push && git push --tags"
   },
   "peerDependencies": {
     "react": "^16.13.1",
