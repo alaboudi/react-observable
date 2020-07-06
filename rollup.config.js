@@ -1,20 +1,28 @@
-import typescript from '@rollup/plugin-typescript';
+import typescript from "rollup-plugin-typescript2";
+import peerDepsExternal from "rollup-plugin-peer-deps-external";
+import pkg from "./package.json";
+
+const input = "src/index.ts";
+const plugins = [
+    peerDepsExternal(),
+    typescript({
+        typescript: require("typescript"),
+        useTsconfigDeclarationDir: true
+    }),
+];
 
 export default {
-    input: 'src/index.ts',
+    input,
+    plugins,
     output: [
         {
-            dir: 'dist',
-            format: 'cjs'
+            format: 'cjs',
+            file: pkg.main,
         },
         {
-            dir: 'dist',
-            format: 'umd'
-        },
-        {
-            dir: 'dist',
-            format: 'es'
+            format: 'esm',
+            file: pkg.module,
         }
     ],
-    plugins: [typescript()]
-};
+}
+

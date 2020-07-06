@@ -3,11 +3,12 @@
   "exclude": ["node_modules", "__tests__"],
   "compilerOptions": {
     "target": "ES5",
-    "module": "CommonJS",
+    "module": "ESNext",
+    "moduleResolution": "node",
     "declaration": true,
-    "sourceMap": true,
     "lib": ["ESNext"],
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "declarationDir": "./dist/types"
   }
 }
