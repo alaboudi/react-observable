@@ -1,6 +1,6 @@
 {
   "name": "@alaboudi/react-observable",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.7",
   "description": "A observable binding for React",
   "author": "Yazan Alaboudi <yazan.alaboudi@gmail.com>",
   "sideEffects": false,
