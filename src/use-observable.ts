@@ -10,12 +10,15 @@ const resolveInitialValue = <T>(source$: Observable<T>, initialValue?: T): (T | 
 
 const useObservable = <T>(source$: Observable<T>, initialValue?: T): T => {
     const [emittedValue, setEmittedValue] = useState<T>(() => resolveInitialValue(source$, initialValue));
+    const [isFirstPaint, setIsFirstPaint] = useState<boolean>(true);
 
     useEffect(() => {
-        const sourceWithoutSync$ = source$.pipe(skipSync);
-        const subscription = sourceWithoutSync$.subscribe(setEmittedValue);
+        const normalizedSource$ = isFirstPaint ? source$.pipe(skipSync) : source$;
+        const subscription = normalizedSource$.subscribe(setEmittedValue);
+
+        setIsFirstPaint(false);
         return () => subscription.unsubscribe();
-    }, [source$]);
+    }, [source$, isFirstPaint, setIsFirstPaint]);
 
     return emittedValue;
 }
