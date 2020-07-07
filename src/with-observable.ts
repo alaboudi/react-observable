@@ -31,7 +31,6 @@ const withObservable = <T>(propName: string, source$: Observable<T>, initialValu
         componentDidUpdate() {
             this.subscription?.unsubscribe();
             this.subscription = source$
-                .pipe(skipSync)
                 .subscribe(this.setObservableValue);
         }
 
