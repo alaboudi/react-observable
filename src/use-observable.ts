@@ -1,26 +1,26 @@
-import {useState, useEffect} from "react";
-import {Observable} from "rxjs";
-import skipSync from "./operators/skip-sync";
+import {Observable, OperatorFunction} from "rxjs";
+import {useEffect, useState} from "react";
+import memoize from "./utility/memoize";
 import getLastSyncEmission from "./utility/get-last-sync-emission";
+import pubRefCountEnhancer from "./utility/enhance-pub-refcount";
 
-const resolveInitialValue = <T>(source$: Observable<T>, initialValue?: T): (T | undefined) => {
-    const lastSyncEmission = getLastSyncEmission(source$);
-    return typeof lastSyncEmission === 'undefined' ? initialValue : lastSyncEmission;
+const resolveInitialValue = <T>(source$: Observable<T>, enhancer: OperatorFunction<T, T>, initialValue?: T): (T | undefined) => {
+    const enhancedSource$ = enhancer(source$);
+    const lastSyncEmission = getLastSyncEmission(enhancedSource$);
+    return lastSyncEmission === undefined ? initialValue : lastSyncEmission;
 }
 
 const useObservable = <T>(source$: Observable<T>, initialValue?: T): T => {
-    const [emittedValue, setEmittedValue] = useState<T>(() => resolveInitialValue(source$, initialValue));
-    const [isFirstPaint, setIsFirstPaint] = useState<boolean>(true);
+    const [enhancer] = useState(() => memoize(pubRefCountEnhancer))
+    const [emittedValue, setEmittedValue] = useState<T>(() => resolveInitialValue(source$, enhancer, initialValue));
 
     useEffect(() => {
-        const normalizedSource$ = isFirstPaint ? source$.pipe(skipSync) : source$;
-        const subscription = normalizedSource$.subscribe(setEmittedValue);
-
-        setIsFirstPaint(false);
+        const enhancedSource$ = enhancer(source$);
+        const subscription = enhancedSource$.subscribe(setEmittedValue);
         return () => subscription.unsubscribe();
-    }, [source$, isFirstPaint, setIsFirstPaint]);
+    }, [source$, setEmittedValue, enhancer]);
 
     return emittedValue;
-}
+};
 
 export default useObservable;

@@ -1,6 +1,7 @@
 import { of, Subject, timer } from "rxjs";
 import { renderHook, act } from '@testing-library/react-hooks'
 import useObservable from "../src/use-observable";
+import {tap} from "rxjs/operators";
 
 describe('useObservable', () => {
     it("should return a value when loaded with a single valued synchronous observable", () => {
@@ -67,7 +68,6 @@ describe('useObservable', () => {
         expect(result.current).toBe(3);
     });
 
-    // todo: make this pass
     it("should return the last emitted value from the newly supplied stream of synchronous observable", () => {
         const source1$ = of(1, 2, 3, 4);
         const source2$ = of(5, 6, 7, 8);
@@ -111,5 +111,15 @@ describe('useObservable', () => {
         const initialFallbackValue = 5;
         const { result } = renderHook(() => useObservable(source$, initialFallbackValue));
         expect(result.current).toBe(3);
+    });
+
+    it("source stream should only detect 1 subscription", () => {
+        let numberOfEmissions = 0;
+        const source$ = of(1).pipe(
+            tap(() => numberOfEmissions++)
+        );
+
+        const { result } = renderHook(() => useObservable(source$));
+        expect(numberOfEmissions).toBe(1)
     });
 });
