@@ -1,7 +1,7 @@
 import { createFactory, Component, ComponentClass, ComponentType} from "react";
 import { Observable, Subscription } from "rxjs";
-import skipSync from "./operators/skip-sync";
 import getLastSyncEmission from "./utility/get-last-sync-emission";
+import survivableShare from "./operators/survivable-share";
 
 const resolveInitialValue = <T>(source$: Observable<T>, initialValue?: T): (T | undefined) => {
     const lastSyncEmission = getLastSyncEmission(source$);
@@ -10,12 +10,13 @@ const resolveInitialValue = <T>(source$: Observable<T>, initialValue?: T): (T | 
 
 const withObservable = <T>(propName: string, source$: Observable<T>, initialValue?: T) => <P>(BaseComponent: ComponentType<P>) => {
     const factory = createFactory(BaseComponent as ComponentClass<P>);
+    const enhancedSource$ = source$.pipe(survivableShare(1));
 
     return class extends Component<P, { emittedValue?: T }> {
         subscription: Subscription | undefined;
         constructor(props: P) {
             super(props);
-            this.state = {emittedValue: resolveInitialValue(source$, initialValue)};
+            this.state = {emittedValue: resolveInitialValue(enhancedSource$, initialValue)};
         }
 
         setObservableValue(val: T) {
@@ -23,14 +24,7 @@ const withObservable = <T>(propName: string, source$: Observable<T>, initialValu
         }
 
         componentDidMount() {
-            this.subscription = source$
-                .pipe(skipSync)
-                .subscribe(this.setObservableValue);
-        }
-
-        componentDidUpdate() {
-            this.subscription?.unsubscribe();
-            this.subscription = source$
+            this.subscription = enhancedSource$
                 .subscribe(this.setObservableValue);
         }
 
