@@ -6,7 +6,7 @@ function survivableShare<T>(survivalCount: number) {
     let deathCount = 0;
     let subscription: Subscription | undefined;
 
-    return (source$: Observable<T>) => new Observable(observer => {
+    return (source$: Observable<T>): Observable<T> => new Observable(observer => {
         refCount++;
         let innerSubscription: Subscription;
         if(!subscription) {
